@@ -1,0 +1,41 @@
+task:
+  name: Build TWRP for malmo
+  container:
+    image: ubuntu:22.04
+
+  env:
+    DEBIAN_FRONTEND: noninteractive
+    LANG: en_US.UTF-8
+
+  install_dependencies_script:
+    - apt update
+    - apt install -y \
+        git-core gnupg flex bison gperf build-essential \
+        zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 \
+        libncurses-dev libncurses6 lib32z1-dev libssl-dev \
+        ccache libgl1-mesa-dev libxml2-utils xsltproc unzip openjdk-11-jdk python-is-python3
+
+  install_repo_tool_script:
+    - mkdir -p /root/bin
+    - curl https://storage.googleapis.com/git-repo-downloads/repo > /root/bin/repo
+    - chmod a+rx /root/bin/repo
+    - export PATH="/root/bin:$PATH"
+
+  init_sync_repo_script:
+    - mkdir -p /root/twrp && cd /root/twrp
+    - /root/bin/repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
+    - /root/bin/repo sync -j2
+
+  add_device_and_kernel_script:
+    - cp -r ${CIRRUS_WORKING_DIR}/device /root/twrp/device
+    - git clone https://github.com/MotorolaMobilityLLC/kernel-msm.git /root/twrp/kernel/motorola/malmo
+
+  build_recovery_script:
+    - cd /root/twrp
+    - source build/envsetup.sh
+    - lunch twrp_malmo-eng
+    - mka recoveryimage
+
+  artifacts:
+    recovery_img:
+      path: /root/twrp/out/target/product/malmo/recovery.img
