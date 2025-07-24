@@ -16,7 +16,8 @@ jobs:
         sudo apt update
         sudo apt install -y git-core gnupg flex bison gperf build-essential \
         zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 \
-        sudo apt install -y libncurses5 || sudo apt install -y libncurses6
+        sudo apt install -y libncurses-dev
+        sudo apt install -y libncurses6
         lib32z1-dev libssl-dev \
         ccache libgl1-mesa-dev libxml2-utils xsltproc unzip openjdk-11-jdk python-is-python3
 
