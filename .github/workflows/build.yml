@@ -20,6 +20,11 @@ jobs:
           libncurses-dev libncurses6 lib32z1-dev libssl-dev \
           ccache libgl1-mesa-dev libxml2-utils xsltproc unzip openjdk-11-jdk python-is-python3
 
+    - name: Configure Git identity
+      run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+
     - name: Install repo tool
       run: |
         mkdir -p ~/bin
@@ -31,12 +36,12 @@ jobs:
       run: |
         mkdir ~/twrp && cd ~/twrp
         repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
-        repo sync -j2
+        repo sync -j2 || repo sync -j1
 
     - name: Add device tree and kernel source
       run: |
         cp -r $GITHUB_WORKSPACE/device ~/twrp/device
-        git clone https://github.com/MotorolaMobilityLLC/kernel-msm.git ~/twrp/kernel/motorola/malmo
+        git clone --depth=1 https://github.com/MotorolaMobilityLLC/kernel-msm.git ~/twrp/kernel/motorola/malmo
 
     - name: Build recovery
       run: |
